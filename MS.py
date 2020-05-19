@@ -9,7 +9,7 @@ import math
 def get_group_centroid(obj_list):
     '''
     Input: iterable of Shapely objects
-    Output: [x,y] coordinates of the group's centroid
+    Output: [x,y] coordinates of the entire group's centroid
     '''
     polygon_list = []
     for shape in obj_list:
@@ -20,11 +20,14 @@ def get_group_centroid(obj_list):
     centroid = MultiPolygon(polygon_list).centroid.coords.xy
     return [coord[0] for coord in centroid]
     
-    
 def scale_geo_columns(df, scaleby, geo):
     '''
-    Input: Geopandas df, column with scale values
+    Input: Geopandas df, string name of column with scale values
     Output: Geopandas df with updated geometry column
+
+    NOTE: This function scales by coordinates. Scaling coordinates by x will
+    scale the area of the shape by x^2. More info:
+    https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
     '''
     newShapes = []
     for shape, scaleby in zip(df[geo], df[scaleby]):
@@ -38,7 +41,13 @@ def scale_geo_columns(df, scaleby, geo):
 def get_overlapping_groups(df):
     '''
     Input: Geopandas df
-    Output: multiple........
+    Outputs:
+        groups: {k:v} where k is the group id and v is a list of shape ids.
+        groupcoords: {k,v} where k is the group id and v is the group centroid.
+        groups_index: The inverse of groups. {k,v} where k is a shape id and
+            v is a group id.
+        index_by_id: {k,v} where k is a shape id, and v is its row index in the
+             original dataframe. Useful for debugging but not used otherwise.
     '''
     #create indices to speed up
     tree = STRtree(df['geometry'])
@@ -120,6 +129,10 @@ def get_overlapping_groups(df):
 
 
 def movePoly(shape, movement):
+    '''
+    Input: shapely Polygon, and a movement vector [x,y]
+    Output: shapely Polygon with coordinates moved by the movement vector
+    '''
     newlong_list = []
     newlat_list = []
     for long, lat in shape.exterior.coords:
@@ -131,9 +144,25 @@ def movePoly(shape, movement):
     return newpoly
 
 
-def nudge_shapes(df,mapLR, groupLR, groupcoords, groups_index, index_by_id):
+def nudge_shapes(df, geo, mapLR, groupLR, groupcoords, groups_index):
+    '''
+    NOTE: This function scales by coordinates. Scaling coordinates by x will
+    scale the area of the shape by x^2. More info:
+    https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
+    
+    Inputs:
+    df: Geopandas dataframe
+    scaleby = string name of column in df with scalar values
+    geo: string name of geometry column in df
+    mapLR: Velocity at which shapes are moved away from the whole map's centroid
+    groupLR: Velocity at which shapes are moved away from their group's centroid
+    groupcoords: {k,v} where k is the group id and v is the group centroid.
+    groups_index: {k,v} where k is a shape id and v is a group id.
+
+    Outputs: Geopandas Dataframe with updated geometry column
+    '''
     newShapes = []
-    for shape in df['geometry']:
+    for shape in df[geo]:
         if id(shape) in list(groups_index.keys()):
             group = groups_index[id(shape)]
             centroid = [x[0] for x in list(shape.centroid.coords.xy)]
@@ -141,7 +170,6 @@ def nudge_shapes(df,mapLR, groupLR, groupcoords, groups_index, index_by_id):
             mapnudge = [a_i - b_i for a_i, b_i in zip(centroid, groupcoords['all'])]
             groupnudge = [a_i - b_i for a_i, b_i in zip(centroid, groupcentroid)]
             movement = [(a*mapLR + b*groupLR) for a,b in zip(mapnudge, groupnudge)]
-            #name = dfscaled['NAME_x'][index_by_id[id(shape)]]
             if isinstance(shape,Polygon):
                 shape = movePoly(shape,movement)
             elif isinstance(shape,MultiPolygon):
@@ -158,15 +186,39 @@ def nudge_shapes(df,mapLR, groupLR, groupcoords, groups_index, index_by_id):
     return dfnew
     
     
-def separate_map(df, mapLR, groupLR, max_epochs, geo='geometry'):
+def separate_map(df, geo, mapLR, groupLR, max_epochs):
+    '''
+    Inputs:
+    df: Geopandas dataframe
+    geo: string name of geometry column in df
+    mapLR: Velocity at which shapes are moved away from the whole map's centroid
+    groupLR: Velocity at which shapes are moved away from their group's centroid
+    max_epochs: Maximum number of attempts to nudge shapes away from each other
+    
+    Outputs: Geopandas df with updated geometry column
+    '''
     newdf = df.copy()
     for i in range(max_epochs):
         if (not i) or (groups):
             groups, groupcoords, groups_index, index_by_id = get_overlapping_groups(newdf)
-            newdf = nudge_shapes(newdf, mapLR, groupLR, groupcoords, groups_index, index_by_id)
+            newdf = nudge_shapes(newdf,geo, mapLR, groupLR, groupcoords, groups_index)
+        else:
+            print(f'separated in {i+1} epochs')
+            break
     return newdf
     
 def scale_map(df, scaleby, geo='geometry', mapLR=.01, groupLR=.1, max_epochs=100):
+    '''
+    Inputs:
+    df: Geopandas dataframe
+    scaleby:
+    geo: string name of geometry column in df
+    mapLR: Velocity at which shapes are moved away from the whole map's centroid
+    groupLR: Velocity at which shapes are moved away from their group's centroid
+    max_epochs: Maximum number of attempts to nudge shapes away from each other
+
+    Outputs: Geopandas df with updated geometry column
+    '''
     scaleddf = scale_geo_columns(df, scaleby, geo)
-    separateddf = separate_map(scaleddf, mapLR, groupLR, max_epochs, geo)
+    separateddf = separate_map(scaleddf, geo, mapLR, groupLR, max_epochs)
     return separateddf
