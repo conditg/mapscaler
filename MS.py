@@ -24,7 +24,6 @@ def scale_geo_columns(df, scaleby, geo):
     '''
     Input: Geopandas df, string name of column with scale values
     Output: Geopandas df with updated geometry column
-
     NOTE: This function scales by coordinates. Scaling coordinates by x will
     scale the area of the shape by x^2. More info:
     https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
@@ -38,7 +37,7 @@ def scale_geo_columns(df, scaleby, geo):
     newdf[geo] = newdf[geo].astype('geometry')
     return newdf
     
-def get_overlapping_groups(df):
+def get_overlapping_groups(df,buffer):
     '''
     Input: Geopandas df
     Outputs:
@@ -58,9 +57,9 @@ def get_overlapping_groups(df):
     for shape in df['geometry']:
         in_existing=False
         #Quickly find objects which have overlapping extents
-        overlaps = tree.query(shape.buffer(.1))
+        overlaps = tree.query(shape.buffer(buffer))
         #Reduce that subset to objects which truly overlap
-        overlaps = [x for x in overlaps if shape.buffer(.1).intersects(x)]
+        overlaps = [x for x in overlaps if shape.buffer(buffer).intersects(x)]
         overlaps_ids = set([id(x) for x in overlaps])
       
         #while groups to check still exist:
@@ -84,8 +83,6 @@ def get_overlapping_groups(df):
             elif len(overlaps)>1:
                 #Create a new group with this shape, and all its overlaps
                 groups[n] = set([id(poly) for poly in overlaps])
-                #print('--- added to group with:')
-                #print(f"---{[dfscaled['NAME_x'][index_by_id[id(x)]] for x in overlaps]}")######make a function for this? verbosity?
                 n+=1
 
     #previously unintersecting sets can become intersecting with later additions
@@ -108,11 +105,7 @@ def get_overlapping_groups(df):
     #remove any  empty sets
     groups = {k: v for k, v in groups.items() if v}
 
-    # for i in groups.keys():
-    #   print(f'group {i}')
-    #   print(f"---{[df['NAME_x'][index_by_id[x]] for x in list(groups[i])]}")
-
-    #find centroids of each group DRY this up #########################################
+    #find centroids of each group
     groupcoords = {}
     for k,v in groups.items():
         shape_list = []
@@ -158,7 +151,6 @@ def nudge_shapes(df, geo, mapLR, groupLR, groupcoords, groups_index):
     groupLR: Velocity at which shapes are moved away from their group's centroid
     groupcoords: {k,v} where k is the group id and v is the group centroid.
     groups_index: {k,v} where k is a shape id and v is a group id.
-
     Outputs: Geopandas Dataframe with updated geometry column
     '''
     newShapes = []
@@ -186,7 +178,7 @@ def nudge_shapes(df, geo, mapLR, groupLR, groupcoords, groups_index):
     return dfnew
     
     
-def separate_map(df, geo, mapLR, groupLR, max_epochs):
+def separate_map(df, geo, mapLR, groupLR, buffer, max_epochs, verbose):
     '''
     Inputs:
     df: Geopandas dataframe
@@ -199,15 +191,20 @@ def separate_map(df, geo, mapLR, groupLR, max_epochs):
     '''
     newdf = df.copy()
     for i in range(max_epochs):
+        if verbose:
+            print(f'epoch {i+1}')
         if (not i) or (groups):
-            groups, groupcoords, groups_index, index_by_id = get_overlapping_groups(newdf)
+            groups, groupcoords, groups_index, index_by_id = get_overlapping_groups(newdf, buffer)
             newdf = nudge_shapes(newdf,geo, mapLR, groupLR, groupcoords, groups_index)
+            if verbose:
+                print(f'{len(groups)} groups remaining')
         else:
-            print(f'separated in {i+1} epochs')
+            if verbose:
+                print(f'separated in {i+1} epochs')
             break
     return newdf
     
-def scale_map(df, scaleby, geo='geometry', mapLR=.01, groupLR=.1, max_epochs=100):
+def scale_map(df, scaleby, geo='geometry', mapLR=.01, groupLR=.1, buffer=0, max_epochs=100, verbose=False):
     '''
     Inputs:
     df: Geopandas dataframe
@@ -216,9 +213,8 @@ def scale_map(df, scaleby, geo='geometry', mapLR=.01, groupLR=.1, max_epochs=100
     mapLR: Velocity at which shapes are moved away from the whole map's centroid
     groupLR: Velocity at which shapes are moved away from their group's centroid
     max_epochs: Maximum number of attempts to nudge shapes away from each other
-
     Outputs: Geopandas df with updated geometry column
     '''
     scaleddf = scale_geo_columns(df, scaleby, geo)
-    separateddf = separate_map(scaleddf, geo, mapLR, groupLR, max_epochs)
+    separateddf = separate_map(scaleddf, geo, mapLR, groupLR, buffer, max_epochs, verbose)
     return separateddf
