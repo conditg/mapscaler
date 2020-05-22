@@ -212,7 +212,10 @@ def scale_map(df, scaleby, geo='geometry', mapLR=.01, groupLR=.1, buffer=0, max_
     geo: string name of geometry column in df
     mapLR: Velocity at which shapes are moved away from the whole map's centroid
     groupLR: Velocity at which shapes are moved away from their group's centroid
+    buffer: Space required between shapes before they are considered overlapping
     max_epochs: Maximum number of attempts to nudge shapes away from each other
+    verbose: boolean - prints progress as shapes are separated
+    
     Outputs: Geopandas df with updated geometry column
     '''
     scaleddf = scale_geo_columns(df, scaleby, geo)

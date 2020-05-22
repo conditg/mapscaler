@@ -3,7 +3,5 @@ Scale geo shapes by a property (such as population) without the shapes overlappi
 
 TODO:
 - Clean up Variable names
-- add area vs. coordinate scaling
-- add export to json
-- add vizualization of progress
-- consider way of showing progress of the 'training'
+- Include minimal example of how the function spaces polygons
+- Post examples of various map trainings
