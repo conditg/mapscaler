@@ -1,7 +1,10 @@
-# map-scaler
-Scale geo shapes by a property (such as population) without the shapes overlapping
+# MapScaler
+![Example visualization](/images/header.png)
 
-TODO:
-- Clean up Variable names
+Scale geopandas shapes by any property (such as population) without the shapes overlapping
+
+
+## Example Usage:
+- Convert to class
 - Include minimal example of how the function spaces polygons
 - Post examples of various map trainings
