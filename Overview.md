@@ -1,6 +1,6 @@
-#Overview of MapScaler
-##The Basics
-MapScaler allows you to scale the rows (polygons) in a [geopandas dataframe]() by a variable, then reorganizes the newly-sized polygons to prevent overlapping. See some examples [here]().
+# Overview of MapScaler
+## The Basics
+MapScaler allows you to scale the rows (polygons) in a [geopandas dataframe](https://geopandas.org/reference/geopandas.GeoDataFrame.html) by a variable, then reorganizes the newly-sized polygons to prevent overlapping. See some examples [here](https://medium.com/@conditg/map-scaler-examples-scale-any-map-by-any-variable).
 After the initial scaling step, MapScaler works iteratively, gently and strategically nudging the polygons in your map until they don't overlap.
 Below is a quick overview, using 4 circles to create a minimalist example.    
 ![Original Chart](/images/original.png)    
