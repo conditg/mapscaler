@@ -1,4 +1,4 @@
-stutils.core import setup
+from setuptools import setup
 setup(
     name = 'mapscaler',
     packages = ['mapscaler'],
@@ -7,12 +7,13 @@ setup(
     description = 'Scale areas of a geopandas map by any property to create more intuitive and beautiful choropleth visualizations.',
     author = 'Greg Condit',
     author_email = 'conditg@gmail.com',
-    url = 'https://github.com/user/conditg/',
-    download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',    # I explain this later on
+    url = 'https://github.com/user/conditg/mapscaler',
+    download_url = 'https://github.com/conditg/mapscaler/archive/v0.1-alpha.tar.gz',
     keywords = ['DATA VISUALIZATION', 'MAP', 'CHOROPLETH', 'CARTOGRAM','MAP SCALER', 'GEOJSON'],
     install_requires=[
-        'validators',
-        'beautifulsoup4',
+        'numpy',
+        'geopandas',
+        'shapely',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

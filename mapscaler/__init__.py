@@ -1,1 +1,1 @@
-from mapscaler import ShapeScaler, BubbleScaler
+from mapscaler.mapscaler import ShapeScaler, BubbleScaler
