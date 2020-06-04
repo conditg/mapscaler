@@ -2,7 +2,7 @@ from setuptools import setup
 setup(
     name = 'mapscaler',
     packages = ['mapscaler'],
-    version = '0.1',
+    version = '0.0.1',
     license='gpl-3.0',
     description = 'Scale areas of a geopandas map by any property to create more intuitive and beautiful choropleth visualizations.',
     author = 'Greg Condit',
@@ -14,15 +14,16 @@ setup(
         'numpy',
         'geopandas',
         'shapely',
+        'json',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: GNU General Public License (GPL)',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
     ],
 )
 
