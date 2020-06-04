@@ -25,7 +25,7 @@ class BaseScaler():
             elif isinstance(shape, MultiPolygon):
                 polygon_list = polygon_list + [poly for poly in shape.geoms]
             else:
-                raise ValueError(f'Geometry values must be Shapely objects, not {type(shape)}')
+                raise ValueError('Geometry values must be Shapely objects, not {}'.format( type(shape) ) )
         centroid = MultiPolygon(polygon_list).centroid.coords.xy
         return [coord[0] for coord in centroid]
 
@@ -187,7 +187,7 @@ class BaseScaler():
                         poly_list.append(poly)
                     shape = MultiPolygon(poly_list)
                 else:
-                    raise ValueError(f'Geometry values must be Shapely objects, not {type(shape)}')
+                    raise ValueError('Geometry values must be Shapely objects, not {}'.format( type(shape) ) )
             new_shapes.append(shape)
         dfnew = df.copy()
         dfnew[geo] = new_shapes
@@ -211,7 +211,7 @@ class BaseScaler():
         newdf = df.copy()
         for i in range(max_iter):
             if verbose:
-                print(f'Iteration {i+1}')
+                print('Iteration {}'.format(i+1)
             #index the new dataframe
             self.index_by_id = self.index_geo_col(newdf, geo)
             #Identify and index overlapping groups
@@ -222,10 +222,10 @@ class BaseScaler():
             if self.overlapping_groups:
                 newdf = self.nudge_shapes(newdf,geo, map_vel, group_vel)
                 if verbose:
-                    print(f'--{len(self.overlapping_groups)} overlapping groups remaining')
+                    print('--{} overlapping groups remaining'.format( len(self.overlapping_groups) ) )
             else:
                 if verbose:
-                    print(f'Separated in {i+1} iterations')
+                    print('Separated in {} iterations'.format(i+1) )
                 break
                 
         return newdf
