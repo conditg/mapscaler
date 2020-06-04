@@ -211,7 +211,7 @@ class BaseScaler():
         newdf = df.copy()
         for i in range(max_iter):
             if verbose:
-                print('Iteration {}'.format(i+1)
+                print('Iteration {}'.format(i+1) )
             #index the new dataframe
             self.index_by_id = self.index_geo_col(newdf, geo)
             #Identify and index overlapping groups
