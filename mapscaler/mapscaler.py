@@ -4,7 +4,7 @@ from shapely.geometry import Polygon, MultiPolygon, Point
 from shapely.ops import unary_union
 from shapely.strtree import STRtree
 from shapely.affinity import scale
-
+from maputils import alberize48_gdf
 
 class BaseScaler():
     def __init__(self):
@@ -13,6 +13,27 @@ class BaseScaler():
         self.index_by_id = {}
         self.group_centroids = {}     
         
+    def scale_shapes(self, df, scaleby, geo):
+        '''
+        Input: 
+            df: Geopandas df, 
+            scaleby: string name of column with scale values
+            geo: string name of geometry column in df
+        Output: Geopandas df with updated geometry column
+        
+        NOTE: This function scales by coordinates. Scaling coordinates by x will
+        scale the area of the shape by x^2. More info:
+        https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
+        '''
+        newShapes = []
+        for shape, scaleby in zip(df[geo], df[scaleby]):
+            poly = scale(shape, xfact=scaleby,yfact=scaleby,origin='center')
+            newShapes.append(poly)
+        newdf = df.copy()
+        newdf[geo] = newShapes
+        newdf[geo] = newdf[geo].astype('geometry')
+        return newdf       
+      
     def get_group_centroid(self, obj_list):
         '''
         Input: iterable of Shapely objects
@@ -136,7 +157,7 @@ class BaseScaler():
         Output:
             index_by_id: {k,v} where k is a shape id, and v is its row index in the df.
         '''
-        index_by_id = dict((id(poly), i) for i, poly in enumerate(df[geo]))
+        index_by_id = dict((id(poly), i) for i, poly in zip(df.index, df[geo]))
         return index_by_id
     
     def move_shape(self, shape, movement):
@@ -154,7 +175,11 @@ class BaseScaler():
         new_shape = Polygon(zip(new_longs, new_lats))
         return new_shape
 
-    def nudge_shapes(self, df, geo, map_vel, group_vel):
+    def nudge_shapes(self, 
+                     df,
+                     geo,
+                     map_vel,
+                     group_vel):
         '''
         Nudges overlapping shapes away from group and map centroids.
         Inputs:
@@ -194,7 +219,14 @@ class BaseScaler():
         return dfnew
 
 
-    def separate_map(self, df, geo, map_vel, group_vel, buffer, max_iter, verbose):
+    def separate_map(self, 
+                     df,
+                     geo,
+                     map_vel,
+                     group_vel,
+                     buffer,
+                     max_iter,
+                     verbose):
         '''
         Inputs:
             df: Geopandas dataframe
@@ -246,29 +278,19 @@ class BaseScaler():
             for member_id in members:
                 group_members[groupnum].append(original_df[property_col][self.index_by_id[member_id]])
         return group_members
-    
+
     
 class ShapeScaler(BaseScaler):
-    
-    def scale_shapes(self, df, scaleby, geo):
-        '''
-        Input: Geopandas df, string name of column with scale values
-        Output: Geopandas df with updated geometry column
         
-        NOTE: This function scales by coordinates. Scaling coordinates by x will
-        scale the area of the shape by x^2. More info:
-        https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
-        '''
-        newShapes = []
-        for shape, scaleby in zip(df[geo], df[scaleby]):
-            poly = scale(shape, xfact=scaleby,yfact=scaleby,origin='center')
-            newShapes.append(poly)
-        newdf = df.copy()
-        newdf[geo] = newShapes
-        newdf[geo] = newdf[geo].astype('geometry')
-        return newdf   
-    
-    def scale_map(self, df, scale_by, geo='geometry', map_vel=.01, group_vel=.1, buffer=0, max_iter=100, verbose=False):
+    def scale_map(self, 
+                  df,
+                  scale_by,
+                  geo='geometry',
+                  map_vel=.01,
+                  group_vel=.1,
+                  buffer=0,
+                  max_iter=100,
+                  verbose=False):
         '''
         Inputs:
         df: Geopandas dataframe
@@ -290,9 +312,9 @@ class ShapeScaler(BaseScaler):
     
 class BubbleScaler(BaseScaler):
     
-    def scale_bubbles(self, df, scaleby, geo):
+    def convert_to_bubbles(self, df, geo):
         '''
-        Input: Geopandas df, string name of column with scale values
+        Input: Geopandas df, string name of geometry column in df
         Output: Geopandas df with updated geometry column, each shape converted to a same-area circle 
         
         NOTE: This function scales by coordinates. Scaling coordinates by x will
@@ -300,18 +322,26 @@ class BubbleScaler(BaseScaler):
         https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
         '''
         bubbles = []
-        for shape, scaleby in zip(df[geo], df[scaleby]):
+        for shape in df[geo]:
             area = shape.area
             long,lat = shape.centroid.coords.xy
-            unscaled_bubble = Point(long[0],lat[0]).buffer(np.sqrt(area/np.pi), resolution=70)
-            bubble = scale(unscaled_bubble, xfact=scaleby,yfact=scaleby,origin='center')
+            bubble = Point(long[0],lat[0]).buffer(np.sqrt(area/np.pi), resolution=70)
             bubbles.append(bubble)
         newdf = df.copy()
         newdf[geo] = bubbles
         newdf[geo] = newdf[geo].astype('geometry')
         return newdf   
     
-    def scale_map(self, df, scale_by, geo='geometry', map_vel=.01, group_vel=.1, buffer=0, max_iter=100, verbose=False):
+    def scale_map(self, 
+                  df,
+                  scale_by,
+                  geo='geometry',
+                  usa_albers=False,
+                  map_vel=.01,
+                  group_vel=.1,
+                  buffer=0,
+                  max_iter=100,
+                  verbose=False):
         '''
         Inputs:
         df: Geopandas dataframe
@@ -325,6 +355,9 @@ class BubbleScaler(BaseScaler):
 
         Outputs: Geopandas df with updated geometry column
         '''
-        bubbled_df = self.scale_bubbles(df, scale_by, geo)
+        scaled_df = self.scale_shapes(df, scale_by, geo)
+        if usa_albers:
+            scaled_df = alberize48_gdf(scaled_df, geo)
+        bubbled_df = self.convert_to_bubbles(scaled_df, geo)
         separated_df = self.separate_map(bubbled_df, geo, map_vel, group_vel, buffer, max_iter, verbose)
         return separated_df
