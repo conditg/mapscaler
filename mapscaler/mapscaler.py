@@ -4,7 +4,7 @@ from shapely.geometry import Polygon, MultiPolygon, Point
 from shapely.ops import unary_union
 from shapely.strtree import STRtree
 from shapely.affinity import scale
-from maputils import alberize48_gdf
+from mapscaler.maputils import alberize48_gdf
 
 class BaseScaler():
     def __init__(self):

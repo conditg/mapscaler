@@ -12,8 +12,16 @@ import mapscaler as ms
 ss = ms.ShapeScaler()
 scaled_df = ss.scale_map(df, 'population_scalar')
 ```
-The above code returns a new GeoPandas dataframe with an updated geometry column.     
-More realistically, you may need to tweak a few arguments to get an ideal map, depending on your scaling inputs. See [the Basic Overview](Overview.md) for more info. (See also the note on [Creating Shape Scalars](CreatingShapeScalars.md)).    
+The above code returns a new GeoPandas dataframe with an updated geometry column, with each shape's area having been scaled (up or down) to reflect its respective scalar.  
+Similarly, all shapes can be converted to circles before scaling by using the BubbleScaler:
+
+```python
+import mapscaler as ms
+
+bs = ms.BubbleScaler()
+scaled_df = bs.scale_map(df, 'population_scalar')
+```
+More realistically, you may need to tweak a few arguments to get an ideal map, depending on the distribution of your initial areas and the distribution of your scalars. See [the Basic Overview](Overview.md) for more info. (See also the tutorial on [Creating Shape Scalars](CreatingShapeScalars.md)).    
 
 ## TODO
 - Post examples of various map trainings
