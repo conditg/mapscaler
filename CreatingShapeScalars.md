@@ -5,7 +5,7 @@ In this tutorial, we'll use a GeoPandas dataframe with 2 columns: a `geometry` c
 ## Data Prep and Cleaning
 Import MapScaler and load a map of the US States:
 ```python
-import ms
+import mapscaler as ms
 loader = ms.MapLoader()
 df = loader.fetch_states()['df']
 ```
