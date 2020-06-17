@@ -13,7 +13,7 @@ We'll restrict this example to the continuous 48 for easier visualizations, so l
 ```python
 df = df[df.STATE != '02'] # AK
 df = df[df.STATE != '15'] # HI
-df = df[df.STATE != '72'] # HI
+df = df[df.STATE != '72'] # PR
 #df.plot() #Optional
 ```
 
