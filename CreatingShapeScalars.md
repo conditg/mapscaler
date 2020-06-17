@@ -29,7 +29,8 @@ While scalars clearly define proportions, they do not specify any sizes specific
 
 There's no reliable programmatic way to choose this scale, because it depends highly on the distribution of shapes in your chart. Here's the extremes:
 - You could choose the densest state for your base (New Jersey). New Jersey would remain the same size, and all other states would shrink. The result would be mathematically accurate proportions between states, but they would all be very small and spaced out, an ugly visualization.    
-- You could choose the least dense state for your base (Alaska). Alaska would remain the same size, and all the other states would expand dramatically. The increased states would all overlap each other, and MapScaler will take a very long time to find a solution with no overlapping states, and by that point, the states will have been rearranged so much that the solution will likely not be recognizeable as a map of the US.        
+- You could choose the least dense state for your base (Alaska). Alaska would remain the same size, and all the other states would expand dramatically. The increased states would all overlap each other, and MapScaler will take a very long time to find a solution with no overlapping states, and by that point, the states will have been rearranged so much that the solution will likely not be recognizeable as a map of the US.      
+
 In short, it's a tradeoff between having large individual shapes, and having a map with an overall shape that still resembles the original.
 Therefore, the best rule of thumb is to pick a shape somewhere in the 60th-80th percentile of variable density. This will result in over half your states shrinking and less than half of them increasing. Start there and tweak as needed.
 
