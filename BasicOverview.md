@@ -12,8 +12,8 @@ Next, organize all the shapes into groups with other shapes they overlap. Shapes
 ![Group Membership](/images/step2.png)    
 Next, find the centroid of each group:    
 ![Group Centroids](/images/step3.png)    
-The direction that each shape will move is a function of its position in relation to BOTH the map centroid, and its group centroid. The degree to which each centroid relation is considered in the formation of the direction vector is determined by the arguments `mapLR` and `groupLR`. Guidelines on using these will be posted at a later date, but in short, the group centroid should be the primary driver of the direction vector, and the map centroid should just be included minimally to achieve faster resolution in cases where a shape gets 'stuck' between 2 others.    
+The direction that each shape will move is a function of its position in relation to BOTH the map centroid, and its group centroid. The degree to which each centroid relation is considered in the formation of the direction vector is determined by the arguments `map_vel` and `group_vel`. Guidelines on using these will be posted at a later date, but in short, the group centroid should be the primary driver of the direction vector, and the map centroid should just be included minimally to achieve faster resolution in cases where a shape gets 'stuck' between 2 others.    
 ![Direction Vector](/images/step4.png)    
 ![Repeat 2-4](/images/step5.png)    
 
-The Bubble Scaler works the same way after converting all shapes in your map to circles with the equivalent area.
+The BubbleScaler works the same way after converting all shapes in your map to circles with the equivalent area.
