@@ -51,13 +51,16 @@ Given base values for area and a variable `var`, this formula will calculate the
 The goal is to scale the area of shape `abc` until it has the same variable-to-area ratio as the base:
 
 ![Proportion Comparison](images/proportion_comparison.gif)
-
+   
 Solving for `scalar` gives:
-
+    
 ![scalar](images/scalar.gif)
-
+    
 Finally, when you scale a shape's coordinates by some scalar x, the area scales at x<sup>2</sup> (see Additional Reading below). Therefore, to scale the area of a shape, the area scalar is the square root of each coordinate scalar.  
-
+    
+```python
+df['scaleby'] = ( (df['EST_POP_2019']*base_area) / (df['area']*base_population) )**.5
+```
 
 ### Additional Reading:
 - [Square-cube Law](https://en.wikipedia.org/wiki/Square-cube_law)
