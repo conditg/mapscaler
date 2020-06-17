@@ -21,5 +21,5 @@ import mapscaler as ms
 bs = ms.BubbleScaler()
 scaled_df = bs.scale_map(df, 'scaleby')
 ```
-More realistically, you may need to tweak a few arguments to get an ideal map, depending on the distribution of your initial areas and the distribution of your scalars. See [the Basic Overview](Overview.md) for more info. (See also the tutorial on [Creating Shape Scalars](CreatingShapeScalars.md)).    
+More realistically, you may need to tweak a few arguments to get an ideal map, depending on the distribution of your initial areas and the distribution of your scalars. See [the Basic Overview](Overview.md) for more info on how these methods rearrange shapes to prevent overlapping. (See also the tutorial on [Creating Shape Scalars](CreatingShapeScalars.md)).    
 

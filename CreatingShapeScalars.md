@@ -62,7 +62,7 @@ Finally, when you scale a shape's coordinates by some scalar x, the area scales 
 df['scaleby'] = ( (df['EST_POP_2019']*base_area) / (df['area']*base_population) )**.5
 ```
 
-This `scaleby` column is ready to be passed as input to `ShapeScaler()` or `BubbleScalar()` as seen in [readme](README.md).
+This `scaleby` column is ready to be passed as input to `ShapeScaler()` or `BubbleScalar()` as seen in the [README](README.md).
 
 ### Additional Reading:
 - [Square-cube Law](https://en.wikipedia.org/wiki/Square-cube_law)
