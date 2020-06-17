@@ -6,13 +6,10 @@ In this tutorial, we'll use a GeoPandas dataframe with 2 columns: a `geometry` c
 Import MapScaler and load a map of the US States:
 ```python
 import ms
-
 loader = ms.MapLoader()
-
 df = loader.fetch_states()['df']
 ```
 We'll restrict this example to the continuous 48 for easier visualizations, so let's drop Alaska, Hawaii, and Puerto Rico.    
-
 ```python
 df = df[df.STATE != '02'] # AK
 df = df[df.STATE != '15'] # HI
@@ -32,7 +29,7 @@ While scalars clearly define proportions, they do not specify any sizes specific
 
 There's no reliable programmatic way to choose this scale, because it depends highly on the distribution of shapes in your chart. Here's the extremes:
 - You could choose the densest state for your base (New Jersey). New Jersey would remain the same size, and all other states would shrink. The result would be mathematically accurate proportions between states, but they would all be very small and spaced out, an ugly visualization.    
-- You could choose the least dense state for your base (Alaska). Alaska would remain the same size, and all the other states would expand dramatically. The increased states would all overlap each other, and MapScaler will take a very long time to find a solution with no overlapping states, and by that point, the states will have been rearranged so much that the solution will likely not be recognizeable as a map of the US.    
+- You could choose the least dense state for your base (Alaska). Alaska would remain the same size, and all the other states would expand dramatically. The increased states would all overlap each other, and MapScaler will take a very long time to find a solution with no overlapping states, and by that point, the states will have been rearranged so much that the solution will likely not be recognizeable as a map of the US.        
 In short, it's a tradeoff between having large individual shapes, and having a map with an overall shape that still resembles the original.
 Therefore, the best rule of thumb is to pick a shape somewhere in the 60th-80th percentile of variable density. This will result in over half your states shrinking and less than half of them increasing. Start there and tweak as needed.
 
@@ -45,21 +42,22 @@ base_area = df[df.NAME == 'Ohio']['area'].values[0]
 
 ## Step 2: Create Scalars
 
-Given base values for variable `var`, this formula will calculate the appropriate scalar by which to adjust the area of given shape `ABC`:
+Given base values for area and a variable `var`, this formula will calculate the appropriate scalar by which to adjust the area of given shape `abc`:
 
 ![Scalar Equation](images/full_equation.gif)
 
 #### Formula Explanation
 
-The goal is to scale the area of shape `ABC` until it has the same variable-to-area ratio as the base:
+The goal is to scale the area of shape `abc` until it has the same variable-to-area ratio as the base:
 
 ![Proportion Comparison](images/proportion_comparison.gif)
 
 Solving for `scalar` gives:
 
-~[scalar](images/scalar.gif)
+![scalar](images/scalar.gif)
 
 Finally, when you scale a shape's coordinates by some scalar x, the area scales at x<sup>2</sup> (see Additional Reading below). Therefore, to scale the area of a shape, the area scalar is the square root of each coordinate scalar.  
+
 
 ### Additional Reading:
 - [Square-cube Law](https://en.wikipedia.org/wiki/Square-cube_law)
