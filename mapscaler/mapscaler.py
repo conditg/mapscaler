@@ -15,15 +15,18 @@ class BaseScaler():
         
     def scale_shapes(self, df, scaleby, geo):
         '''
-        Input: 
-            df: Geopandas df, 
-            scaleby: string name of column with scale values
-            geo: string name of geometry column in df
-        Output: Geopandas df with updated geometry column
+        Scale the Coordinates of all map shapes by their respective scalars.
         
-        NOTE: This function scales by coordinates. Scaling coordinates by x will
-        scale the area of the shape by x^2. More info:
-        https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param scaleby: string name of the column in **df** with scalar values
+        :type scaleby: str        
+        :param geo: string name of the geometry column in **df**
+        :type geo: str        
+        
+        
+        .. warning:: This function scales by coordinates. Scaling coordinates by :math:`x` will
+            scale the area of the shape by :math:`x^2`. More info: :ref:`scalars`
         '''
         newShapes = []
         for shape, scaleby in zip(df[geo], df[scaleby]):
@@ -36,8 +39,12 @@ class BaseScaler():
       
     def get_group_centroid(self, obj_list):
         '''
-        Input: iterable of Shapely objects
-        Output: [x,y] coordinates of the entire group's centroid
+        Calculate the geometric centroid of a group of objects.
+        
+        :param obj_list: Iterable of Shapely objects (Polygon or MultiPolygon)
+        :type obj_list: list
+        :returns: [x,y] coordinates of the entire group's geometric centroid
+        :rtype: ``list``
         '''
         polygon_list = []
         for shape in obj_list:
@@ -52,12 +59,16 @@ class BaseScaler():
 
     def get_overlapping_groups(self, df, geo, buffer):
         '''
-        Input: 
-            df: Geopandas df
-            geo: string name of geometry column in df
-            buffer: Distance required between shapes before they are considered non-overlapping
-        Outputs:
-            overlapping_groups: {k:v} where k is the group id and v is a list of shape ids.
+        Return all groups of overlapping shapes in a map.
+        
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param geo: string name of the geometry column in **df**
+        :type geo: str
+        :param buffer: Euclidean distance required between shapes before they are considered non-overlapping
+        :type buffer: float
+        :returns: key, value pairs where key is is the group id and value is a list of shape ids.
+        :rtype: ``dict``
         '''
         #create indices to speed up
         tree = STRtree(df[geo])
@@ -119,8 +130,11 @@ class BaseScaler():
     
     def index_overlapping_groups(self):
         '''
-        Output: 
-            overlapping_groups_index: {k,v} where k is a shape id and v is a group number.
+        Return a mapping of Shape IDs to their current overlapping groups;
+        Inverse of :meth:`get_overlapping_groups`.
+        
+        :returns: key, value pairs where key is a shape id, and value is a group id
+        :rtype: ``dict``
         '''
         overlapping_groups_index = {}
         for groupnum, members in self.overlapping_groups.items():
@@ -131,11 +145,14 @@ class BaseScaler():
     
     def update_group_centroids(self, df, geo):
         '''
-        Inputs:
-            df: Geopandas dataframe
-            geo: string name of geometry column in df
-        Output:
-            group_centroids: {k,v} where k is the group id and v is the group centroid.
+        Calculate the geometric centroid of all overlapping groups.
+        
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param geo: string name of the geometry column in **df**
+        :type geo: str
+        :returns: key, value pairs where key is the group id, and value is the group centroid
+        :rtype: ``dict``
         '''    
         group_centroids = {}
         for groupnum, members in self.overlapping_groups.items():
@@ -151,19 +168,28 @@ class BaseScaler():
 
     def index_geo_col(self, df, geo):
         '''
-        Inputs:
-            df: Geopandas dataframe
-            geo: string name of geometry column in df
-        Output:
-            index_by_id: {k,v} where k is a shape id, and v is its row index in the df.
+        Returns a mapping of Shape IDs to their initial index in the dataframe. 
+        
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param geo: string name of the geometry column in **df**
+        :type geo: str
+        :returns: key, value pairs where key is is a shape id, and value is its row index in **df**
+        :rtype: ``dict``
         '''
         index_by_id = dict((id(poly), i) for i, poly in zip(df.index, df[geo]))
         return index_by_id
     
     def move_shape(self, shape, movement):
         '''
-        Input: shapely Polygon, and a movement vector [x,y]
-        Output: shapely Polygon with coordinates moved by the movement vector
+        Move a Shapely Polygon by a given movement vector.
+        
+        :param shape: Shape to be moved 
+        :type shape: Shapely Polygon    
+        :param movement: vector [x,y] describing the movement
+        :type movement: list or tuple
+        :returns: Shape with updated coordinates 
+        :rtype: Shapely ``Polygon``
         '''
         new_longs = []
         new_lats = []
@@ -181,14 +207,19 @@ class BaseScaler():
                      map_vel,
                      group_vel):
         '''
-        Nudges overlapping shapes away from group and map centroids.
-        Inputs:
-            df: Geopandas dataframe
-            geo: string name of geometry column in df
-            map_vel: Velocity at which shapes are nudged away from the whole map's centroid
-            group_vel: Velocity at which shapes are nudged away from their group's centroid
+        Nudge overlapping shapes away from group and map centroids.
         
-        Outputs: Geopandas Dataframe with updated geometry column
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param geo: string name of the geometry column in **df**
+        :type geo: str
+        :param map_vel: Velocity at which each shape is nudged away from the centroid of the whole map
+        :type map_vel: float
+        :param group_vel: Velocity at which each shape is nudged away from the centroid of its
+            respective group of overlapping shapes
+        :type group_vel: float    
+        :returns: Dataframe with updated geometry column 
+        :rtype: GeoPandas ``DataFrame``
         '''
         new_shapes = []
         for shape in df[geo]:
@@ -228,17 +259,27 @@ class BaseScaler():
                      max_iter,
                      verbose):
         '''
-        Inputs:
-            df: Geopandas dataframe
-            geo: string name of geometry column in df
-            map_vel: Velocity at which shapes are moved away from the whole map's centroid
-            group_vel: Velocity at which shapes are moved away from their group's centroid
-            buffer: Distance required between shapes before they are considered non-overlapping
-            max_iter: Maximum number of attempts to resolve overlaps by nudging shapes
-            verbose: boolean - prints progress as shapes are separated
+        Reposition shapes on a map so that none of them overlap.
         
-        Outputs: 
-            Geopandas df with updated geometry column
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame    
+        :param geo: String name of the geometry column in **df**
+        :type geo: str
+        :param map_vel: Velocity at which each shape is nudged away from the centroid 
+            of the whole map
+        :type map_vel: float
+        :param group_vel: Velocity at which each shape is nudged away from the centroid of its
+            respective group of overlapping shapes
+        :type group_vel: float  
+        :param buffer: Euclidean distance required between shapes before they 
+            are considered non-overlapping
+        :type buffer: float
+        :param max_iter: Maximum number of attempts to nudge shapes away from each other
+        :type max_iter: int
+        :param verbose: Whether to print progress as shapes are separated
+        :type verbose: boolean
+        :returns: Dataframe with updated geometry column 
+        :rtype: GeoPandas ``DataFrame``
         '''
         newdf = df.copy()
         for i in range(max_iter):
@@ -264,13 +305,17 @@ class BaseScaler():
     
     def get_group_members(self, original_df, property_col):
         '''
-        Prints the members of each group, given a column from the
-        original dataframe to print. Useful for debugging groups that won't converge.
+        Returns the members of each group, given a column from the
+        original dataframe to print. Useful for debugging / inspecting groups that are too slow to separate.
         
-        Inputs: 
-            original_df: GeoPandas Dataframe previously passed to scale_map method.
-            property_col: String name of column in original_df that identifies each shape. Typically
-                a name or ID.
+        :param original_df: GeoPandas Dataframe previously passed to :meth:`scale_map` method
+        :type original_df: GeoPandas DataFrame
+        :param property_col: String name of column in original_df that identifies each shape; 
+            Typically a name or ID
+        :type property_col: str
+        :returns: key, value pairs where key is an arbitrary group number and value is a list 
+            of **property_col** values describing the group members
+        :rtype: ``dict``
         '''
         group_members = {}
         for groupnum, members in self.overlapping_groups.items():
@@ -284,7 +329,7 @@ class ShapeScaler(BaseScaler):
         
     def scale_map(self, 
                   df,
-                  scale_by,
+                  scaleby,
                   geo='geometry',
                   map_vel=.01,
                   group_vel=.1,
@@ -292,19 +337,34 @@ class ShapeScaler(BaseScaler):
                   max_iter=100,
                   verbose=False):
         '''
-        Inputs:
-        df: Geopandas dataframe
-        scale_by:string name of scalar column in df
-        geo: string name of geometry column in df
-        map_vel: Velocity at which shapes are moved away from the whole map's centroid
-        group_vel: Velocity at which shapes are moved away from their group's centroid
-        buffer: Space required between shapes before they are considered non-overlapping
-        max_iter: Maximum number of attempts to nudge shapes away from each other
-        verbose: boolean - prints progress as shapes are separated
-
-        Outputs: Geopandas df with updated geometry column
+        Automatically scale the parts of any map by any variable, without any 
+        overlapping shapes and with minimal distortion. 
+        
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param scaleby: string name of the column in **df** with scalar values
+        :type scaleby: str    
+        :param geo: *Optional* - string name of the geometry column in **df**; default is ``'geometry'``
+        :type geo: str
+        :param map_vel: *Optional* - Velocity at which each shape is nudged away from the centroid 
+            of the whole map; dfault is ``.01``
+        :type map_vel: float
+        :param group_vel: *Optional* - Velocity at which each shape is nudged away from the centroid of its
+            respective group of overlapping shapes; default is ``.1``
+        :type group_vel: float  
+        :param buffer: *Optional* - Euclidean distance required between shapes before they 
+            are considered non-overlapping; default is ``0``
+        :type buffer: float
+        :param max_iter: *Optional* - Maximum number of attempts to nudge shapes away from 
+            each other; default is ``100``
+        :type max_iter: int
+        :param verbose: *Optional* - Whether to print progress as shapes are separated; 
+            default is ``False``
+        :type verbose: boolean
+        :returns: Dataframe with updated geometry column 
+        :rtype: GeoPandas ``DataFrame``
         '''
-        scaled_df = self.scale_shapes(df, scale_by, geo)
+        scaled_df = self.scale_shapes(df, scaleby, geo)
         separated_df = self.separate_map(scaled_df, geo, map_vel, group_vel, buffer, max_iter, verbose)
         return separated_df
     
@@ -314,12 +374,14 @@ class BubbleScaler(BaseScaler):
     
     def convert_to_bubbles(self, df, geo):
         '''
-        Input: Geopandas df, string name of geometry column in df
-        Output: Geopandas df with updated geometry column, each shape converted to a same-area circle 
+        Convert all shapes in a geopandas dataframe to circles, retaining areas and centroid coordinates.
         
-        NOTE: This function scales by coordinates. Scaling coordinates by x will
-        scale the area of the circle by x^2. More info:
-        https://github.com/conditg/map-scaler/blob/master/CreatingShapeScalars.md
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame    
+        :param geo: String name of the geometry column in **df**
+        :type geo: str
+        :returns: Dataframe with updated geometry column, each shape converted to a same-area circle  
+        :rtype: GeoPandas ``DataFrame``
         '''
         bubbles = []
         for shape in df[geo]:
@@ -334,7 +396,7 @@ class BubbleScaler(BaseScaler):
     
     def scale_map(self, 
                   df,
-                  scale_by,
+                  scaleby,
                   geo='geometry',
                   usa_albers=False,
                   map_vel=.01,
@@ -343,19 +405,37 @@ class BubbleScaler(BaseScaler):
                   max_iter=100,
                   verbose=False):
         '''
-        Inputs:
-        df: Geopandas dataframe
-        scale_by:string name of scalar column in df
-        geo: string name of geometry column in df
-        map_vel: Velocity at which shapes are moved away from the whole map's centroid
-        group_vel: Velocity at which shapes are moved away from their group's centroid
-        buffer: Space required between shapes before they are considered non-overlapping
-        max_iter: Maximum number of attempts to nudge shapes away from each other
-        verbose: boolean - prints progress as shapes are separated
-
-        Outputs: Geopandas df with updated geometry column
+        Convert all shapes in a map to circles, and automatically scale the parts of any map by any variable, 
+        without any overlapping shapes and with minimal distortion. 
+        
+        :param df: GeoPandas Dataframe 
+        :type df: GeoPandas DataFrame
+        :param scaleby: string name of the column in **df** with scalar values
+        :type scaleby: str    
+        :param geo: *Optional* - string name of the geometry column in **df**; default is ``'geometry'``
+        :type geo: str
+        :param usa_albers: *Optional* - Whether to apply an albers projection prior to converting to bubbles.
+            `More Info on Projections <https://en.wikipedia.org/wiki/Albers_projection>`_. Default is ``False``
+        :type usa_albers: boolean
+        :param map_vel: *Optional* - Velocity at which each shape is nudged away from the centroid 
+            of the whole map; dfault is ``.01``
+        :type map_vel: float
+        :param group_vel: *Optional* - Velocity at which each shape is nudged away from the centroid of its
+            respective group of overlapping shapes; default is ``.1``
+        :type group_vel: float  
+        :param buffer: *Optional* - Euclidean distance required between shapes before they 
+            are considered non-overlapping; default is ``0``
+        :type buffer: float
+        :param max_iter: *Optional* - Maximum number of attempts to nudge shapes away from 
+            each other; default is ``100``
+        :type max_iter: int
+        :param verbose: *Optional* - Whether to print progress as shapes are separated; 
+            default is ``False``
+        :type verbose: boolean
+        :returns: Dataframe with updated geometry column 
+        :rtype: GeoPandas ``DataFrame``
         '''
-        scaled_df = self.scale_shapes(df, scale_by, geo)
+        scaled_df = self.scale_shapes(df, scaleby, geo)
         if usa_albers:
             scaled_df = alberize48_gdf(scaled_df, geo)
         bubbled_df = self.convert_to_bubbles(scaled_df, geo)

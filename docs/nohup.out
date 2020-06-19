@@ -1,0 +1,14 @@
+[I 21:41:40.952 NotebookApp] Serving notebooks from local directory: /home/conditg/dsprojects/mapscaler/docs
+[I 21:41:40.953 NotebookApp] The Jupyter Notebook is running at:
+[I 21:41:40.953 NotebookApp] http://localhost:8888/?token=df96ab6ee7a7043e142adde7e6b9b2caa8f58c5220e8f67a
+[I 21:41:40.954 NotebookApp]  or http://127.0.0.1:8888/?token=df96ab6ee7a7043e142adde7e6b9b2caa8f58c5220e8f67a
+[I 21:41:40.954 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 21:41:41.426 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/conditg/.local/share/jupyter/runtime/nbserver-31902-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=df96ab6ee7a7043e142adde7e6b9b2caa8f58c5220e8f67a
+     or http://127.0.0.1:8888/?token=df96ab6ee7a7043e142adde7e6b9b2caa8f58c5220e8f67a
+[I 21:44:16.114 NotebookApp] Shutting down on /api/shutdown request.
+[I 21:44:16.117 NotebookApp] Shutting down 0 kernels

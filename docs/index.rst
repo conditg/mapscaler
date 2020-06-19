@@ -1,18 +1,17 @@
-mapscaler Documentation
+Official mapscaler Documentation
 =====================================
 
-Guide
-^^^^^
+Contents
+^^^^^^^^^^
 .. toctree::
    :maxdepth: 2
    
+   install
+   loader
+   scalars
+   shapescaler
+   bubbler
+   overview
    license
-   help
+   contact
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
