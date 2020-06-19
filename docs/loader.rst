@@ -34,7 +34,7 @@ That's it! You now have a map of the states.
     plt.show()
 
 .. image:: ../images/counties.png
-   :alt: US states
+   :alt: US Counties
    :align: center
 
 
