@@ -39,11 +39,12 @@ There's no reliable programmatic way to choose this scale, because it depends hi
 
 In short, it's a tradeoff between having large individual shapes, and having a map with an overall shape that still resembles the original. Therefore, the best rule of thumb is to pick a base shape somewhere in the 60th-80th percentile of variable density. This will result in over half your shapes shrinking and less than half of them increasing. Start there and tweak as needed.
 
-In this tutorial, we'll use Ohio, the 10th densest state by Population. Store the variable value (population) and the area of your base:
+In this tutorial, we'll use Washtenaw County, Michigan. This was determined with a small amount of trail & error by running Shape Scaler, and inspecting the output, which is covered in the next section. Store the variable value (population) and the area of your base:
 ::
 
-    base_population = df[df.NAME == 'Ohio']['EST_POP_2019'].values[0]
-    base_area = df[df.NAME == 'Ohio']['area'].values[0]
+    base_fips = '26161'
+    base_population = df[df.FIPS==base_fips]['EST_POP_2019'].values[0]
+    base_area = df[df.FIPS==base_fips]['area'].values[0]
 
 Step 2: Create Scalars
 ^^^^^^^^^^^^^^^^^^^^^^^
