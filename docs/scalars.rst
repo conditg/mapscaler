@@ -3,7 +3,7 @@
 Creating Shape Scalars from a Variable
 ========================================
 
-In this tutorial, we'll use a GeoPandas dataframe with 2 columns: a ``geometry`` column of US state shapes, and a population column of numeric values. (Of course, the following steps will work for other variables besides population - any numeric input will do.
+In this tutorial, we'll use a GeoPandas dataframe with 2 columns: a ``geometry`` column of US county shapes, and a population column of numeric values. (Of course, the following steps will work for other variables besides population - any numeric input will do.
 
 Data Prep and Cleaning
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -13,14 +13,14 @@ Import MapScaler and load a map of the US States:
 
     import mapscaler as ms
     loader = ms.MapLoader()
-    df = loader.fetch_states()['df']
+    df = loader.fetch_counties()['df']
 
 We'll restrict this example to the continuous 48 for easier visualizations, so let's drop Alaska, Hawaii, and Puerto Rico.
 ::
 
-    df = df[df.STATE != '02'] # AK
-    df = df[df.STATE != '15'] # HI
-    df = df[df.STATE != '72'] # PR
+    df = df[df.STATE_FIPS != '02'] # AK
+    df = df[df.STATE_FIPS != '15'] # HI
+    df = df[df.STATE_FIPS != '72'] # HI
 
 Step 1: Choose a 'base' for scale
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
