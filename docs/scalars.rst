@@ -8,7 +8,7 @@ In this tutorial, we'll use a GeoPandas dataframe with 2 columns: a ``geometry``
 Data Prep and Cleaning
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Import MapScaler and load a map of the US States:
+Import MapScaler and load a map of the US Counties:
 ::
 
     import mapscaler as ms
@@ -20,7 +20,7 @@ We'll restrict this example to the continuous 48 for easier visualizations, so l
 
     df = df[df.STATE_FIPS != '02'] # AK
     df = df[df.STATE_FIPS != '15'] # HI
-    df = df[df.STATE_FIPS != '72'] # HI
+    df = df[df.STATE_FIPS != '72'] # PR
 
 Step 1: Choose a 'base' for scale
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

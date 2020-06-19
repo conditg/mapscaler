@@ -13,7 +13,7 @@ Import MapScaler and load a map of the US Counties:
     loader = ms.MapLoader()
     df = loader.fetch_counties()['df']
 
-That's it! You now have a map of the states. 
+That's it! You now have a map of the counties. 
 ::
 
     import matplotlib.pyplot as plt
@@ -21,9 +21,9 @@ That's it! You now have a map of the states.
     import geoplot.crs as gcrs
 
     #Reduce to the lower 48 for an easier demonstration
-    df = df[df.STATE_FIPS != '02'] # AK
-    df = df[df.STATE_FIPS != '15'] # HI
-    df = df[df.STATE_FIPS != '72'] # HI
+    df = df[df.STATE_FIPS != '02'] # remove AK
+    df = df[df.STATE_FIPS != '15'] # remove HI
+    df = df[df.STATE_FIPS != '72'] # remove PR
     
     gplt.polyplot(
         df, 
