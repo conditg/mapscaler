@@ -3,8 +3,10 @@
 
 Scale areas of a geopandas map by any property (such as population) - without the shapes overlapping - to create more intuitive and beautiful choropleth visualizations.
 
+[Official Documentation](https://mapscaler.readthedocs.io/en/latest/shapescaler.html)
 
-## Example Usage:
+
+## Quick Start:
 Suppose you have a GeoPandas Dataframe `df`, including a column `scaleby` that is a float column indicating how much each sample should grow or shrink to reflect each location's respective population. The goal is for the area of each location to visually portray it's contribution to the entire map for your chosen variable (population, in this example).     
 ```python
 import mapscaler as ms
@@ -21,5 +23,5 @@ import mapscaler as ms
 bs = ms.BubbleScaler()
 scaled_df = bs.scale_map(df, 'scaleby')
 ```
-More realistically, you may need to tweak a few arguments to get an ideal map, depending on the distribution of your initial areas and the distribution of your scalars. See [the Basic Overview](Overview.md) for more info on how these methods rearrange shapes to prevent overlapping. (See also the tutorial on [Creating Shape Scalars](CreatingShapeScalars.md)).    
+More realistically, you may need to tweak a few arguments to get an ideal map, depending on the distribution of your initial areas and the distribution of your scalars. See [the documentation](https://mapscaler.readthedocs.io/en/latest/shapescaler.html) for full examples. 
 
