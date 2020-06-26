@@ -17,7 +17,7 @@ setup(
     author = 'Greg Condit',
     author_email = 'conditg@gmail.com',
     url = 'https://mapscaler.readthedocs.io/en/latest/index.html',
-    download_url = 'https://github.com/conditg/mapscaler/archive/v0.0.3.tar.gz',
+    download_url = 'https://github.com/conditg/mapscaler/archive/v0.0.4.tar.gz',
     keywords = ['DATA VISUALIZATION', 'MAP', 'CHOROPLETH', 'CARTOGRAM','MAP SCALER', 'GEOJSON'],
     install_requires=[
         'numpy',
