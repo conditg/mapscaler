@@ -17,7 +17,7 @@ NOTE: This example uses the variable ``df`` as seen in the example in :ref:`lcm`
     
     bs = ms.BubbleScaler()
     bubble_df = bs.scale_map(df, 'scaleby', usa_albers=True, 
-                   map_vel=.001, group_Vel=.15, verbose=True)
+                   map_vel=.001, group_vel=.15, verbose=True)
 
 If ``verbose``, :func:`~mapscaler.BubbleScaler.scale_map` will print progress as it goes (truncated below):
 
