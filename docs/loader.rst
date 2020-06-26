@@ -18,7 +18,6 @@ That's it! You now have a map of the counties.
 
     import matplotlib.pyplot as plt
     import geoplot as gplt
-    import geoplot.crs as gcrs
 
     #Reduce to the lower 48 for an easier demonstration
     df = df[df.STATE_FIPS != '02'] # remove AK
@@ -27,10 +26,10 @@ That's it! You now have a map of the counties.
     
     gplt.polyplot(
         df, 
-        projection=gcrs.AlbersEqualArea(),
+        projection=gplt.crs.AlbersEqualArea(),
         figsize=(15,8),
         )
-    plt.suptitle('Continguous United States', fontsize=20, ha='center')
+    plt.suptitle('Contiguous United States', fontsize=20, ha='center')
     plt.show()
 
 .. image:: ../images/counties.png

@@ -1,4 +1,9 @@
 from setuptools import setup
+from os import path
+
+this_dir = path.abspath(path.dirname(__file__))
+with open(path.join(this_dir, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 setup(
     name = 'mapscaler',
     packages = ['mapscaler'],
@@ -6,6 +11,8 @@ setup(
     version = '0.0.3',
     license='gpl-3.0',
     description = 'Scale areas of a geopandas map by any property to create more intuitive and beautiful choropleth visualizations.',
+    long_description = long_description,
+    long_description_content = 'text/markdown',
     author = 'Greg Condit',
     author_email = 'conditg@gmail.com',
     url = 'https://github.com/user/conditg/mapscaler',

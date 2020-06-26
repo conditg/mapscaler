@@ -1,5 +1,5 @@
 # MapScaler
-![Example visualization](/images/header.png)
+![Example visualization](https://raw.githubusercontent.com/conditg/mapscaler/master/images/header.png)
 
 Scale areas of a geopandas map by any property (such as population) - without the shapes overlapping - to create more intuitive and beautiful choropleth visualizations.
 

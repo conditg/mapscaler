@@ -40,23 +40,22 @@ Now, let's visualize the output, ``scaled_df``:
 
     import matplotlib.pyplot as plt
     import geoplot as gplt
-    import geoplot.crs as gcrs
     import numpy as np
     
     gplt.choropleth(
         df, hue=[np.log(x) for x in df.EST_POP_2019],
-        projection=gcrs.AlbersEqualArea(),
+        projection=gplt.crs.AlbersEqualArea(), cmap='viridis',
         figsize=(15,8),
     )
-    plt.suptitle('BEFORE', fontsize=20, ha='center')
+    plt.title('BEFORE', fontsize=30, loc='left')
     plt.show()      
 
     gplt.choropleth(
         scaled_df, hue=[np.log(x) for x in df.EST_POP_2019],
-        projection=gcrs.AlbersEqualArea(),
+        projection=gplt.crs.AlbersEqualArea(), cmap='viridis',
         figsize=(15,8),
     )
-    plt.suptitle('AFTER', fontsize=20, ha='center')
+    plt.title('AFTER', fontsize=30, loc='left')
     plt.show()
 
 
